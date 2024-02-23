@@ -63,7 +63,7 @@ create table utilisateur(
 #procedures
 delimiter $$
 drop procedure augmenter$$
-create procedure augmenter(in id int, in nom varchar(50))
+create procedure augmenter(in idS int, in idC int )
 begin
 declare nombreTour int;
 declare nombreTourTotal int;
@@ -71,26 +71,26 @@ declare numeroC int;
 
 select numero into numeroC
 from Equipes 
-where idSession = id and nomClasse = nom;
+where idSession = idS and idClasse = idC;
 
 select nbTours into nombreTourTotal
 from Classes
-where nomClasse like nom ;
+where idClasse = idC ;
 
 select nbTours into nombreTour
 from Equipes 
-where idSession = id and numero = numeroC;
+where idSession = idC and numero = numeroC;
 
 update Classes
 set nbTours = nombreTourTotal + 1
-where nomClasse like nom ;
+where idClasse = idC;
 
 update Equipes
 set nbTours = nombreTour + 1
-where idSession = id and numero = numeroC;
+where idSession = idS and numero = numeroC;
 end $$
 drop procedure reduire$$ 
-create procedure reduire (in id int, in nom varchar(50) )
+create procedure reduire (in idS int, in idC int)
 begin 
 declare nombreTour int;
 declare nombreTourTotal int;
@@ -98,24 +98,24 @@ declare num int ;
 
 select numero into num 
 from Equipes 
-where idSession = id and nomClasse = nom ;
+where idSession = idS and idClasse = idC;
 
 select nbTours into nombreTourTotal
 from Classes
-where nomClasse like nom;
+where idClasse = idC;
 
 select nbTours into nombreTour
 from Equipes 
-where idSession = id and numero = num;
+where idSession = idS and numero = num;
 if (nombreTour > 0)
 then 
 update Classes
 set nbTours = nombreTourTotal - 1
-where nomClasse like nom;
+where idClasse = idC;
 
 update Equipes
 set nbTours = nombreTour - 1
-where idSession = id and numero = num;
+where idSession = idS and numero = num;
 end if;
 end $$ 
 drop procedure insertClasse$$
@@ -125,17 +125,18 @@ insert into Classes(nomClasse, nbEtudiant, nbTours)
 values(nom, nb, 0);
 end $$
 drop procedure updateClasse$$
-create procedure updateClasse(in ancienNom varchar(50), in nom varchar(50), in nb int)
+create procedure updateClasse(in idC int, in nom varchar(50), in nb int)
 begin
 if (nom is null )
 then
-set nom = ancienNom;
+select nomClasse into nom
+from Classes where idClasse = idC;
 end if;
 if (nb is null)
 then 
 select nbEtudiant into nb
 from Classes
-where nomClasse like ancienNom;
+where idClasse = idC;
 end if;
 update Classes
 set nomClasse = nom,
@@ -143,15 +144,19 @@ nbEtudiant = nb
 where nomClasse like ancienNom;
 end $$
 drop procedure deleteClasse $$
-create procedure deleteClasse(in nom varchar(50))
+create procedure deleteClasse(in id int)
 begin 
-delete from Equipes where nomClasse like nom;
-delete from Classes where nomClasse like nom;
+delete from Equipes where idClasse = id ;
+delete from Classes where idClasse = id ;
 end$$
 
 # non testée
-create procedure insertCourse(in  E1 varchar(50), in E2 varchar(50), in E3 varchar(50), in E4 varchar(50)) 
+create procedure insertCourse(in  E1 int, in E2 int, in E3 int, in E4 int) 
 begin 
+declare N1 varchar (50);
+declare N2 varchar (50);
+declare N3 varchar (50);
+declare N4 varchar (50);
 declare lastID int;
 select max(idSession)+1 into lastID
 from Sessions;
@@ -161,25 +166,30 @@ values(lastID, null, null);
 
 if (E1 is not null) 
 then 
+select nomClasse into N1 from Classe where idClasse = E1;
 insert into Equipes(idSession,nomClasse, numero,nbTours)
-values(lastID, E1, 1, 0);
+values(lastID, N1, 1, 0);
 end if;
 
 if (E2 is not null) 
 then 
+select nomClasse into N2 from Classe where idClasse = E2;
 insert into Equipes(idSession,nomClasse, numero,nbTours)
-values(lastID, E2, 2, 0);
+values(lastID, N2, 2, 0);
 end if;
 
 if (E3 is not null) 
 then 
+select nomClasse into N3 from Classe where idClasse = E3;
 insert into Equipes(idSession,nomClasse, numero,nbTours)
-values(lastID, E3, 3, 0);
+values(lastID, N3, 3, 0);
 end if;
 if (E4 is not null) 
 then 
+select nomClasse into N4 from Classe where idClasse = E4;
+
 insert into Equipes(idSession,nomClasse, numero,nbTours)
-values(lastID, E4, 4, 0);
+values(lastID, N4, 4, 0);
 end if;
 end $$
 delimiter ;
@@ -200,10 +210,12 @@ left join Classes as c1 on e1.idClasse = c1.idClasse
 left join Classes as c2 on e2.idClasse = c2.idClasse
 left join Classes as c3 on e3.idClasse = c3.idClasse
 left join Classes as c4 on e4.idClasse = c4.idClasse;
+
 drop view classementGeneral;
 create view classementGeneral
-as select nomClasse, nbEtudiant,nbTours 
+as select idClasse, nomClasse, nbEtudiant,nbTours 
 from Classes order by nbTours desc ;
+
 drop view vueProf;
 create view vueProf as
 select idClasse, nomClasse, nbEtudiant
