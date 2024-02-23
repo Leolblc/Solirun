@@ -35,6 +35,8 @@ if(isset($_POST['classe']) && isset($_POST['nbEleve'])) {
 }
 $mysql->close();
 
-echo file_get_contents('index.php');
+header("Location: index.php");
+
+exit;
 
 ?>
