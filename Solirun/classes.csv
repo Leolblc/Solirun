@@ -1,0 +1,43 @@
+Nom;Effectif;Niveau;Filière
+1ERE 1;34;1ERE;1ère générale
+1ERE 10;31;1ERE;1ère STMG
+1ERE 11;29;1ERE;1ère STMG
+1ERE 12;31;1ERE;1ère STMG
+1ERE 2;34;1ERE;1ère générale
+1ERE 3;33;1ERE;1ère générale
+1ERE 4;34;1ERE;1ère générale
+1ERE 5;31;1ERE;1ère générale
+1ERE 6;33;1ERE;1ère générale
+1ERE 7;32;1ERE;1ère générale
+1ERE 9;31;1ERE;1ère STMG
+2NDE 1;29;2NDE;Seconde générale et technologique
+2NDE 10;30;2NDE;Seconde générale et technologique
+2NDE 11;30;2NDE;Seconde générale et technologique
+2NDE 2;32;2NDE;Seconde générale et technologique
+2NDE 3;29;2NDE;Seconde générale et technologique
+2NDE 4;31;2NDE;Seconde générale et technologique
+2NDE 5;30;2NDE;Seconde générale et technologique
+2NDE 6;33;2NDE;Seconde générale et technologique
+2NDE 7;30;2NDE;Seconde générale et technologique
+2NDE 8;30;2NDE;Seconde générale et technologique
+2NDE 9;32;2NDE;Seconde générale et technologique
+CG1;22;BTS 1ère année;
+CG2;16;BTS 2ème année;
+MCO1;29;BTS 1ère année;
+MCO2;24;BTS 2ème année;
+NDRC1;30;BTS 1ère année;
+NDRC2;23;BTS 2ème année;
+SIO1;28;BTS 1ère année;
+SIO2;22;BTS 2ème année;
+T1;33;TERMINALE;Terminale générale
+T10;33;TERMINALE;Terminale STMG
+T11;34;TERMINALE;Terminale STMG
+T12;33;TERMINALE;Terminale STMG
+T13;34;TERMINALE;Terminale STMG
+T2;32;TERMINALE;Terminale générale
+T3;31;TERMINALE;Terminale générale
+T4;30;TERMINALE;Terminale générale
+T5;32;TERMINALE;Terminale générale
+T6;32;TERMINALE;Terminale générale
+T7;30;TERMINALE;Terminale générale
+T8;33;TERMINALE;Terminale générale
