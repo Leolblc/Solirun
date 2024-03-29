@@ -1,6 +1,5 @@
 use  Solirun;
 # tables
-
 CREATE TABLE Sessions(
    idSession INT auto_increment,
    dateSession DATETIME,
@@ -8,6 +7,7 @@ CREATE TABLE Sessions(
    nbTours int,
    PRIMARY KEY(idSession)
 );
+#*/
 
 CREATE TABLE Classes(
    idClasse int auto_increment,
@@ -16,7 +16,6 @@ CREATE TABLE Classes(
    nbTours INT,
    PRIMARY KEY(idClasse)
 );
-
 CREATE TABLE Equipes(
    idSession INT,
    idClasse int,
@@ -32,9 +31,11 @@ create table utilisateur(
 	login varchar(20),
     motDePasse varchar(50), # a augmenter pour pouvoir stoquer le hash
 	Primary key(login, motDePasse));
-#*/  
+#*/
+/
 #procedures
 delimiter $$
+
 create procedure augmenter(in idS int, in idC int )
 begin
 declare nombreTour int;
@@ -61,6 +62,7 @@ update Equipes
 set nbTours = nombreTour + 1
 where idSession = idS and numero = numeroC;
 end $$
+
 create procedure reduire (in idS int, in idC int)
 begin 
 declare nombreTour int;
@@ -89,11 +91,13 @@ set nbTours = nombreTour - 1
 where idSession = idS and numero = num;
 end if;
 end $$ 
+
 create procedure insertClasse(in nom varchar(50), in nb int)
 begin
 insert into Classes(nomClasse, nbEtudiant, nbTours)
 values(nom, nb, 0);
 end $$
+
 create procedure updateClasse(in idC int, in nom varchar(50), in nb int)
 begin
 if (nom is null )
@@ -107,11 +111,13 @@ select nbEtudiant into nb
 from Classes
 where idClasse = idC;
 end if;
+
 update Classes
 set nomClasse = nom,
 nbEtudiant = nb
-where nomClasse like ancienNom;
+where idClasse = idC;
 end $$
+
 create procedure deleteClasse(in id int)
 begin 
 delete from Equipes where idClasse = id ;
@@ -120,14 +126,13 @@ end$$
 
 create procedure insertCourse(in  E1 int, in E2 int, in E3 int, in E4 int) 
 begin 
-# N = nom
 declare lastID int;
+# id de la session actuelle
+insert into Sessions(dateSession, dateFin, nbTours ) 
+values(null, null, 0);
+
 select max(idSession) into lastID
 from Sessions;
-set lastID = lastID +1;
-
-insert into Sessions(idSession, dateSession, dateFin) 
-values(lastID, null, null);
 
 if (E1 is not null) 
 then 
@@ -171,20 +176,34 @@ end $$
 
 create procedure startCourse(in id int, in debut datetime)
 begin
-declare fin datetime ;
-select dateFin into fin from Sessions where idSession = id;
+update Sessions
+set dateSession = debut
+where idSession = id;
 end $$
-*/
 
+create procedure finCourse(in id int, in horaire dateTime)
+begin
+update Sessions
+set dateFin = horaire
+where idSession = id;
+end $$
+
+create procedure deleteCourse (in id int)
+begin
+delete from Sessions where idSession = id;
+delete from Equipes where idSession = id;
+end $$ 
 
 delimiter ;
 
 
 # vues
 create view infoSessions as
-select S.idSession as 'Session', dateSession as 'debutCourse', dateFin as 'finDeLaCourse', c1.nomClasse as 'equipe1', e1.nbTours as 'toursEquipe1',c1.nbEtudiant as 'nbEquipe1',
-c2.nomClasse as 'equipe2', e2.nbTours as 'toursEquipe2',c2.nbEtudiant as 'nbEquipe2',c3.nomClasse as 'equipe3', e3.nbTours as 'toursEquipe3',c3.nbEtudiant as 'nbEquipe3',
-c4.nomClasse as 'equipe4', e4.nbTours as 'toursEquipe4',c4.nbEtudiant as 'nbEquipe4'
+select S.idSession as 'Session', dateSession as 'debutCourse', dateFin as 'finDeLaCourse',
+ c1.nomClasse as 'equipe1', c1.nbTours as 'toursEquipe1',c1.nbEtudiant as 'nbEquipe1',
+c2.nomClasse as 'equipe2', c2.nbTours as 'toursEquipe2',c2.nbEtudiant as 'nbEquipe2',
+c3.nomClasse as 'equipe3', c3.nbTours as 'toursEquipe3',c3.nbEtudiant as 'nbEquipe3',
+c4.nomClasse as 'equipe4', c4.nbTours as 'toursEquipe4',c4.nbEtudiant as 'nbEquipe4'
 from Sessions as S
 left join Equipes as e1 on e1.idSession = S.idSession and e1.numero = 1 
 left join Equipes as e2 on e2.idSession = S.idSession and e2.numero = 2
@@ -196,7 +215,7 @@ left join Classes as c3 on e3.idClasse = c3.idClasse
 left join Classes as c4 on e4.idClasse = c4.idClasse;
 
 create view classementGeneral
-as select idClasse, nomClasse, nbEtudiant,nbTours 
+as select idClasse, nomClasse, nbEtudiant, nbTours 
 from Classes order by nbTours desc ;
 
 create view vueProf as
